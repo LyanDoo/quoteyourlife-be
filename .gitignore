@@ -1,0 +1,17 @@
+/target
+
+.env
+
+**/*.rs.bk
+**/*.swp
+*.iml
+
+.DS_Store
+Thumbs.db
+
+# Diesel specific
+/src/schema.rs 
+
+# Logs (jika aplikasi Anda menghasilkan log)
+*.log
+/logs/

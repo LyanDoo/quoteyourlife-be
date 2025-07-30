@@ -1,0 +1,31 @@
+[package]
+name = "quoteyourlife-be"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Web Framework
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+
+# Database (PostgreSQL) and ORM
+diesel = { version = "2.1", features = ["postgres", "r2d2", "uuid", "chrono"] }
+# Diesel perlu fitur "r2d2" untuk pool koneksi asinkronus (blocking pool)
+# dan "uuid", "chrono" untuk tipe data UUID dan Timestamp
+
+# Serialisasi/Deserialisasi JSON
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Utility for environment variables
+dotenvy = "0.15"
+
+# Tipe data UUID
+uuid = { version = "1.8", features = ["serde", "v4"] }
+
+# Tipe data Timestamp
+chrono = { version = "0.4", features = ["serde"] }
+
+# Loggin (opsional tapi bagus untuk debugging)
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
