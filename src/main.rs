@@ -5,7 +5,7 @@ use axum::{
 };
 
 use tokio::net::TcpListener;
-
+use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod models;
@@ -27,9 +27,15 @@ async fn main() {
     // Buat pool koneksi database
     let pool = db::establish_connection();
 
+    let cors = CorsLayer::new()
+        .allow_origin(tower_http::cors::Any)
+        .allow_methods(tower_http::cors::Any)
+        .allow_headers(tower_http::cors::Any);
+
     // Buat router Axum
     let app = Router::new()
         .route("/quotes", get(handlers::get_all_quotes).post(handlers::create_new_quote))
+        .layer(cors) // Middleware CORS
         .layer(Extension(pool)); // Tambahkan pool ke layer Axum agar bisa diakses handler
 
     // Definisikan alamat server

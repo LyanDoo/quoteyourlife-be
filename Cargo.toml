@@ -8,6 +8,8 @@ edition = "2024"
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
 
+tower-http = { version = "0.5", features = ["full"]}
+
 # Database (PostgreSQL) and ORM
 diesel = { version = "2.1", features = ["postgres", "r2d2", "uuid", "chrono"] }
 # Diesel perlu fitur "r2d2" untuk pool koneksi asinkronus (blocking pool)
