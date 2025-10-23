@@ -2,14 +2,18 @@ use axum::{
     routing::get,
     Router,
     Extension,
+    extract::DefaultBodyLimit
 };
 
 use tokio::net::TcpListener;
-use tower_http::cors::CorsLayer;
+use tower_http::{
+    cors::CorsLayer,
+    limit::RequestBodyLimitLayer
+};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod models;
-mod schema; // Penting untuk Diesel
+mod schema;
 mod db;
 mod handlers;
 
@@ -34,7 +38,11 @@ async fn main() {
 
     // Buat router Axum
     let app = Router::new()
+        .route("/", get(|| async {"Hello, world!"}))
         .route("/quotes", get(handlers::get_all_quotes).post(handlers::create_new_quote))
+        .route("/gallery", get(handlers::get_all_nft).post(handlers::create_new_nft))
+        .layer(DefaultBodyLimit::disable())
+        .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))
         .layer(cors) // Middleware CORS
         .layer(Extension(pool)); // Tambahkan pool ke layer Axum agar bisa diakses handler
 

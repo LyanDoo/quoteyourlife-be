@@ -4,7 +4,7 @@ use uuid::Uuid;
 use chrono::NaiveDateTime;
 
 // Ini adalah import dari schema.rs yang dihasilkan Diesel
-use crate::schema::quotes;
+use crate::schema::{quotes, nft};
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Selectable, Insertable)]
 #[diesel(table_name = quotes)]
@@ -22,4 +22,24 @@ pub struct Quote {
 pub struct NewQuote {
     pub text: String,
     pub author: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Queryable, Selectable, Insertable)]
+#[diesel(table_name = nft)]
+pub struct NFT {
+    pub id: Uuid,
+    pub title: String,
+    pub description: String,
+    pub author: String,
+    pub filename: String,
+    pub created_at: NaiveDateTime
+}
+
+#[derive(Debug, Deserialize, Insertable)]
+#[diesel(table_name = nft)]
+pub struct NewNFT {
+    pub title: String,
+    pub description: String,
+    pub author: String,
+    pub filename: String,
 }

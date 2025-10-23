@@ -1,4 +1,5 @@
 /target
+/dev/*
 
 .env
 
@@ -11,6 +12,7 @@ Thumbs.db
 
 # Diesel specific
 /src/schema.rs 
+/diesel.toml
 
 # Logs (jika aplikasi Anda menghasilkan log)
 *.log

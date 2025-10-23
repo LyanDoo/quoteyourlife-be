@@ -1,3 +1,4 @@
 -- This file should undo anything in `up.sql`
 -- down.sql
 DROP TABLE quotes;
+DROP TABLE nft;

@@ -13,7 +13,7 @@ QuoteYourLife Backend is a Rust-based web service for managing and serving quote
 ### Prerequisites
 - Rust (https://www.rust-lang.org/tools/install)
 - PostgreSQL
-- Diesel CLI (`cargo install diesel_cli`)
+- Diesel CLI (`cargo install diesel_cli --no-default-features --features "postgres"`)
 
 ### Setup
 1. **Clone the repository:**
@@ -26,11 +26,16 @@ QuoteYourLife Backend is a Rust-based web service for managing and serving quote
    copy .example.env .env
    # Edit .env to match your database settings
    ```
-3. **Run database migrations:**
+3. **Setup database migrations:**
+   ```sh
+   diesel setup
+   diesel migration generate qyl_migrations
+   ```
+4. **Run database migrations:**
    ```sh
    diesel migration run
    ```
-4. **Build and run the server:**
+5. **Build and run the server:**
    ```sh
    cargo run
    ```
