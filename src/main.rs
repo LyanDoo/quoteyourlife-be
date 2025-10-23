@@ -5,6 +5,7 @@ use axum::{
     extract::DefaultBodyLimit
 };
 
+use dotenv::dotenv;
 use tokio::net::TcpListener;
 use tower_http::{
     cors::CorsLayer,
@@ -19,6 +20,7 @@ mod handlers;
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
     // Inisialisasi logging
     tracing_subscriber::registry()
         .with(

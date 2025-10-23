@@ -12,6 +12,7 @@ use crate::db::{PgPool, get_conn};
 use tracing::{info, error};
 use tokio::fs;
 use std::path::Path;
+use std::env;
 
 // 1. Tipe Error Kustom
 #[derive(Debug)]
@@ -118,6 +119,7 @@ pub async fn create_new_nft(
     Extension(pool): Extension<PgPool>,
     mut multipart: Multipart
 ) -> Result<Json<NFT>, AppError> {
+    let public_dir = env::var("PUBLIC_DIR").expect("Set the Public Directory in .env");
     let mut author_: String = String::new();
     let mut title_: String = String::new();
     let mut description_: String = String::new();
@@ -139,7 +141,7 @@ pub async fn create_new_nft(
             "image" => {
                 filename_ = field.file_name().unwrap().to_string();
                 let data = field.bytes().await.unwrap();
-                let upload_dir = Path::new("uploads");
+                let upload_dir = Path::new(&public_dir);
                 if !upload_dir.exists() {
                     fs::create_dir_all(upload_dir).await.unwrap();
                 }
