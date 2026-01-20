@@ -20,3 +20,5 @@ Thumbs.db
 *.log
 /logs/
 /binaries
+
+.vscode/
