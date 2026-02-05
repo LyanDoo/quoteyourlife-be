@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -31,9 +29,9 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-quoteyourlife}}
       RUST_LOG: ${RUST_LOG:-info}
       SERVER_HOST: 0.0.0.0
-      SERVER_PORT: 8080
+      SERVER_PORT: 3000
     ports:
-      - "8080:8080"
+      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,6 +44,8 @@ services:
 
 volumes:
   postgres_data:
+    external: true
+    name: qyl_postgres_data
 
 networks:
   qyl-network:

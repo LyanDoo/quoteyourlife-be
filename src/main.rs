@@ -47,8 +47,8 @@ async fn main() {
         .layer(Extension(pool)); // Tambahkan pool ke layer Axum agar bisa diakses handler
 
     // Definisikan alamat server
-    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
-    tracing::info!("Server running on http://127.0.0.1:3000");
+    let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    tracing::info!("Server running on http://0.0.0.0:3000");
 
     // Jalankan server
     axum::serve(listener, app)
