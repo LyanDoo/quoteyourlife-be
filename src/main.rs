@@ -13,10 +13,8 @@ use tower_http::{
 };
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod models;
-mod schema;
-mod db;
-mod handlers;
+use quoteyourlife_be::handlers;
+use quoteyourlife_be::db;
 
 #[tokio::main]
 async fn main() {
