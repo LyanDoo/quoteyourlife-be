@@ -39,6 +39,7 @@ async fn main() {
     // Buat router Axum
     let app = Router::new()
         .route("/", get(|| async {"Hello, world!"}))
+        .route("/health", get(|| async {"Health: Good"}))
         .route("/quotes", get(handlers::get_all_quotes).post(handlers::create_new_quote))
         .route("/gallery", get(handlers::get_all_nft).post(handlers::create_new_nft))
         .layer(DefaultBodyLimit::disable())
