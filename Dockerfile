@@ -28,7 +28,7 @@ COPY src ./src
 # COPY migrations ./migrations
 # COPY diesel.toml ./diesel.toml
 
-# RUN cargo install diesel_cli --no-default-features --features "postgres"
+RUN cargo install diesel_cli --no-default-features --features "postgres"
 
 # RUN diesel setup && \
 #     diesel migration generate qyl_migrations && \
