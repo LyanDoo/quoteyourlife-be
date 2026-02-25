@@ -13,7 +13,8 @@ tower-http = { version = "0.5", features = ["full"]}
 dotenv = "0.15"
 
 # Database (PostgreSQL) and ORM
-diesel = { version = "2.3.2", features = ["postgres", "r2d2", "uuid", "chrono"] }
+diesel = { version = "2.3.2", features = ["postgres", "r2d2", "uuid", "chrono", "serde_json"] }
+diesel-derive-enum = { version = "2.0", features = ["postgres"] }
 # Diesel perlu fitur "r2d2" untuk pool koneksi asinkronus (blocking pool)
 # dan "uuid", "chrono" untuk tipe data UUID dan Timestamp
 
