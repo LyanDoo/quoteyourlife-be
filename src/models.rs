@@ -48,22 +48,22 @@ pub struct NewNFT {
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Selectable, Insertable)]
 #[diesel(table_name = users)]
-pub struct Users {
+pub struct User {
     pub id: Uuid,
     pub username: String,
     pub email: String,
     pub password_hash: String,
-    pub full_name: String,
+    pub full_name: Option<String>,
     pub created_at: NaiveDateTime
 }
 
 #[derive(Debug, Deserialize, Insertable)]
 #[diesel(table_name = users)]
-pub struct NewUsers {
+pub struct NewUser {
     pub username: String,
     pub email: String,
     pub password_hash: String,
-    pub full_name: String
+    pub full_name: Option<String>
 }
 
 #[derive(Debug, DbEnum, Serialize, Deserialize, PartialEq)]
@@ -80,11 +80,11 @@ pub struct Article {
     pub id: Uuid,
     pub title: String,
     pub slug: String,
-    pub excerpt: String,
+    pub excerpt: Option<String>,
     pub content: Value,
     pub status: ArticleStatusEnum,
     pub author_id: Uuid,
-    pub published_at: NaiveDateTime,
+    pub published_at: Option<NaiveDateTime>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime
 }

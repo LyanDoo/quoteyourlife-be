@@ -42,11 +42,13 @@ async fn main() {
         .route("/health", get(|| async {"Health: Good"}))
         .route("/quotes", get(handlers::get_all_quotes).post(handlers::create_new_quote))
         .route("/gallery", get(handlers::get_all_nft).post(handlers::create_new_nft))
+        .route("/users", get(handlers::get_all_users))
+        .fallback(handlers::handle_404)
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))
         .layer(cors) // Middleware CORS
         .layer(Extension(pool)); // Tambahkan pool ke layer Axum agar bisa diakses handler
-
+        
     // Definisikan alamat server
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
     tracing::info!("Server running on http://0.0.0.0:3000");

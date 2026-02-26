@@ -1,13 +1,14 @@
 use axum::{
     extract::Extension,
     http::StatusCode,
+    http::Uri,
     response::{IntoResponse, Response},
     Json,
 };
 use axum_extra::extract::Multipart;
 use diesel::prelude::*;
 use serde_json::json;
-use crate::models::{NewNFT, NewQuote, Quote, NFT};
+use crate::models::{Article, NFT, NewNFT, NewQuote, Quote, User};
 use crate::db::{PgPool, get_conn}; 
 use tracing::{info, error};
 use tokio::fs;
@@ -175,3 +176,48 @@ pub async fn create_new_nft(
     info!("Created new NFT: {:?}", new_nft);
     Ok(Json(new_nft))
 } 
+
+pub async fn get_all_articles(
+    Extension(pool): Extension<PgPool>,
+) -> Result<Json<Vec<Article>>, AppError> {
+    let articles = tokio::task::spawn_blocking(move || -> Result<_, AppError> {
+        let mut conn = get_conn(&pool)?;
+        use crate::schema::articles::dsl::*;
+        let results = articles.load::<Article>(&mut conn)?;
+        Ok(results)
+    })
+    .await
+    .map_err(AppError::AsyncTaskError)?
+    ?;
+
+    Ok(Json(articles))
+}
+
+pub async fn get_all_users(
+    Extension(pool): Extension<PgPool>,
+) -> Result<Json<Vec<User>>, AppError> {
+    let users = tokio::task::spawn_blocking(move || -> Result<_, AppError> {
+        let mut conn = get_conn(&pool)?;
+        use crate::schema::users::dsl::*;
+        let results = users.load::<User>(&mut conn)?;
+        Ok(results)
+    })
+    .await
+    .map_err(AppError::AsyncTaskError)?
+    ?;
+
+    info!("Fetches {} users", users.len());
+    Ok(Json(users))
+}
+
+pub async fn handle_404(uri: Uri) -> impl IntoResponse {
+    error!("Error '{}' not found", uri);
+    (
+        StatusCode::NOT_FOUND,
+        Json(json!({
+            "status": "fail",
+            "message": "Route not found"
+        }))
+    )
+}
+
