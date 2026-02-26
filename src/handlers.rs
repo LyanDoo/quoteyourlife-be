@@ -8,7 +8,7 @@ use axum::{
 use axum_extra::extract::Multipart;
 use diesel::prelude::*;
 use serde_json::json;
-use crate::models::{Article, NFT, NewNFT, NewQuote, Quote, User};
+use crate::models::{Article, NFT, NewArticle, NewNFT, NewQuote, NewUser, Quote, User};
 use crate::db::{PgPool, get_conn}; 
 use tracing::{info, error};
 use tokio::fs;
@@ -221,3 +221,44 @@ pub async fn handle_404(uri: Uri) -> impl IntoResponse {
     )
 }
 
+pub async fn create_new_user(
+    Extension(pool): Extension<PgPool>,
+    Json(payload): Json<NewUser>
+) -> Result<Json<User>, AppError> {
+    let new_user = tokio::task::spawn_blocking(move || -> Result<_, AppError> {
+        let mut conn = get_conn(&pool)?;
+        use crate::schema::users::dsl::*;
+        let result = diesel::insert_into(users)
+            .values(&payload)
+            .returning(User::as_returning())
+            .get_result(&mut conn)?;
+        Ok(result)
+    })
+    .await
+    .map_err(AppError::AsyncTaskError)?
+    ?;
+
+    info!("Created new user: {:?}", new_user);
+    Ok(Json(new_user))
+}
+
+pub async fn create_new_article(
+    Extension(pool): Extension<PgPool>,
+    Json(payload): Json<NewArticle>
+) -> Result<Json<Article>, AppError> {
+    let new_article = tokio::task::spawn_blocking(move || -> Result<_, AppError> {
+        let mut conn = get_conn(&pool)?;
+        use crate::schema::articles::dsl::*;
+        let result = diesel::insert_into(articles)
+            .values(payload)
+            .returning(Article::as_returning())
+            .get_result(&mut conn)?;
+        Ok(result)
+    })
+    .await
+    .map_err(AppError::AsyncTaskError)?
+    ?;
+
+    info!("Created new article: {:?}", new_article);
+    Ok(Json(new_article))
+}
