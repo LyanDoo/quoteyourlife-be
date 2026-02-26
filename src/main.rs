@@ -1,5 +1,8 @@
+mod handlers;
+
 use axum::{
     routing::get,
+    routing::post,
     Router,
     Extension,
     extract::DefaultBodyLimit
@@ -13,8 +16,8 @@ use tower_http::{
 };
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use quoteyourlife_be::handlers;
 use quoteyourlife_be::db;
+
 
 #[tokio::main]
 async fn main() {
@@ -40,10 +43,11 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async {"Hello, world!"}))
         .route("/health", get(|| async {"Health: Good"}))
-        .route("/quotes", get(handlers::get_all_quotes).post(handlers::create_new_quote))
-        .route("/gallery", get(handlers::get_all_nft).post(handlers::create_new_nft))
-        .route("/users", get(handlers::get_all_users).post(handlers::create_new_user))
-        .route("/article", get(handlers::get_all_articles).post(handlers::create_new_article))
+        .route("/quotes", get(handlers::quote::get_all_quotes).post(handlers::quote::create_new_quote))
+        .route("/gallery", get(handlers::nft::get_all_nft).post(handlers::nft::create_new_nft))
+        .route("/users", get(handlers::user::get_all_users).post(handlers::user::create_new_user))
+        .route("/article", get(handlers::article::get_all_articles).post(handlers::article::create_new_article))
+        .route("/auth/login", post(handlers::auth::login))
         .fallback(handlers::handle_404)
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))

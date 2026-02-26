@@ -36,3 +36,5 @@ chrono = { version = "0.4", features = ["serde"] }
 # Loggin (opsional tapi bagus untuk debugging)
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+bcrypt = "0.18.0"

@@ -1,0 +1,79 @@
+use axum::{Extension, response::IntoResponse};
+use diesel::{ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl};
+use quoteyourlife_be::{db::{PgPool, get_conn}, models::User};
+use tracing::{info,error};
+use axum::{
+    Json,
+    http::StatusCode
+};
+use serde_json::json;
+use serde::Deserialize;
+use bcrypt::{
+    verify
+};
+use crate::handlers::AppError;
+
+#[derive(Deserialize)]
+pub struct LoginData {
+    username: String,
+    password: String
+}
+
+pub async fn login(
+    Extension(pool): Extension<PgPool>,
+    Json(payload): Json<LoginData>
+) -> impl IntoResponse {
+    let user_name = payload.username;
+    let password = payload.password;
+    if user_name == "" || password == "" {
+        error!("Username/password tidak boleh kosong!");
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({
+                "status": "fail",
+                "message": "Username/password tidak boleh kosong!"
+            }))
+        )
+    }
+
+    let result = tokio::task::spawn_blocking(move || -> Result<_, AppError>{
+        let mut conn = get_conn(&pool)?;
+        use quoteyourlife_be::schema::users::dsl::*;
+        let results = users.filter(username.eq(&user_name)).load::<User>(&mut conn)?;
+        Ok(results)
+    })
+        .await
+        .map_err(AppError::AsyncTaskError).unwrap().unwrap();
+    
+    if result.is_empty() {
+        error!("Username tidak ditemukan!");
+        return (
+            StatusCode::NOT_FOUND,
+            Json(json!({
+                "status": "fail",
+                "message": "Username tidak ditemukan!"
+            }))
+        )
+    }
+    info!("Ditemukan data user [{:?}]", &result[0].username);
+    if verify(&password, &result[0].password_hash).expect("Gagal verifikasi") {
+        info!("Login Berhasil");
+        return (
+            StatusCode::ACCEPTED,
+            Json(json!({
+                "status": "success",
+                "message": "Login Berhasil"
+            }))
+        )
+    } else {
+        error!("Login Gagal: Password Salah!");
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({
+                "status": "fail",
+                "message": "Login Gagal: Password Salah!"
+            }))
+        )
+    }
+    
+}
