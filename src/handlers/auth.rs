@@ -12,6 +12,7 @@ use bcrypt::{
     verify
 };
 use crate::handlers::AppError;
+use crate::utils::jwt::create_jwt;
 
 #[derive(Deserialize)]
 pub struct LoginData {
@@ -58,13 +59,31 @@ pub async fn login(
     info!("Ditemukan data user [{:?}]", &result[0].username);
     if verify(&password, &result[0].password_hash).expect("Gagal verifikasi") {
         info!("Login Berhasil");
-        return (
-            StatusCode::ACCEPTED,
-            Json(json!({
-                "status": "success",
-                "message": "Login Berhasil"
-            }))
-        )
+
+        let token = tokio::task::spawn_blocking(move || -> Result <String, jsonwebtoken::errors::Error>{
+            create_jwt(&result[0].id.to_string())
+        }).await
+        .expect("Error pada saat tokenisasi");
+
+        let token = match token {
+            Ok(token) =>(
+                StatusCode::ACCEPTED,
+                Json(json!({
+                    "status": "success",
+                    "message": "Login Berhasil",
+                    "token": &token
+                }))
+            ),
+            Err(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "status": "fail",
+                    "message": "Login Gagal, Internal server error"
+                }))
+            )
+        };
+        token
+
     } else {
         error!("Login Gagal: Password Salah!");
         return (

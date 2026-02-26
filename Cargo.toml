@@ -38,3 +38,4 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 bcrypt = "0.18.0"
+jsonwebtoken = {version = "10.3.0", features=["rust_crypto"]}
