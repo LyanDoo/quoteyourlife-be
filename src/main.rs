@@ -45,6 +45,7 @@ async fn main() {
         .route("/users", get(handlers::user::get_all_users).post(handlers::user::create_new_user).layer(middleware::from_fn(middlewares::jwt::jwt_validation)))
         .route("/article", get(handlers::article::get_all_articles).post(handlers::article::create_new_article))
         .route("/auth/login", post(handlers::auth::login))
+        .route("/auth/verify", post(handlers::auth::verify_jwt))
         .fallback(handlers::handle_404)
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))

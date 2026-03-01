@@ -4,7 +4,9 @@ use quoteyourlife_be::{db::{PgPool, get_conn}, models::User};
 use tracing::{info,error};
 use axum::{
     Json,
-    http::StatusCode
+    http::StatusCode,
+    http::Request,
+    body::Body
 };
 use serde_json::json;
 use serde::Deserialize;
@@ -13,6 +15,10 @@ use bcrypt::{
 };
 use crate::handlers::AppError;
 use crate::utils::jwt::create_jwt;
+use crate::utils::jwt::{
+    Claims,
+    verify_jwt as verify_jwt_utils
+};
 
 #[derive(Deserialize)]
 pub struct LoginData {
@@ -95,4 +101,22 @@ pub async fn login(
         )
     }
     
+}
+
+pub async fn verify_jwt(
+    request: Request<Body>
+) -> Result<Json<Claims>, AppError> {
+    let auth_header = request.headers()
+        .get("Authorization")
+        .and_then(|h| h.to_str().ok())
+        .ok_or(AppError::GeneralError("Internal Server Error".to_string()))?;
+
+    let token = auth_header
+        .strip_prefix("Bearer ")
+        .ok_or(AppError::GeneralError("Internal Server Error".to_string()))?;
+
+    let user_claims = verify_jwt_utils(token)
+        .map_err(|err| AppError::JWTValidationError(err))?;
+
+    Ok(Json(user_claims))
 }
