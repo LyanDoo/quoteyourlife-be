@@ -15,6 +15,7 @@ use serde::{
     Deserialize, 
     Serialize
 };
+use tracing::info;
 
 use crate::handlers::AppError;
 
@@ -41,7 +42,13 @@ pub fn create_jwt(user_id: &str) -> Result<String, AppError>{
 }
 
 pub fn verify_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
-    let secret_key = env::var("JWT_KEY").expect("Gagal membaca environment variable");
+let secret_key = env::var("JWT_KEY")
+    .map_err(|e| {
+        // Ini akan memunculkan daftar env yang terbaca di log prod
+        info!("Current envs: {:?}", env::vars().collect::<Vec<_>>());
+        e
+    })
+    .expect("Gagal membaca JWT_KEY");
 
     let token_data = decode(
         &token,
