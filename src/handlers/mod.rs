@@ -12,7 +12,7 @@ use axum::{
 };
 
 use serde_json::json;
-use tracing::{error};
+use tracing::{error, warn};
 
 
 
@@ -73,6 +73,7 @@ impl From<diesel::result::Error> for AppError {
 // 4. Handler yang sudah diperbaiki
 
 pub async fn handle_404(uri: Uri) -> impl IntoResponse {
+    warn!("[404] Requested route not found: {}", uri);
     error!("Error '{}' not found", uri);
     (
         StatusCode::NOT_FOUND,

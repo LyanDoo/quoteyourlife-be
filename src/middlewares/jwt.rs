@@ -19,8 +19,9 @@ pub async fn jwt_validation(
     let secret_key = env::var("JWT_KEY").expect("Gagal membaca environment variable");
     let auth_header = request.headers()
         .get("Authorization")
-        .and_then(|h| h.to_str().ok())
-        .ok_or(AppError::GeneralError("Internal Server Error".to_string()))?;
+        .ok_or(AppError::GeneralError("Authorizaiton header needed!".to_string()))?
+        .to_str().unwrap();
+
 
     let token = auth_header
         .strip_prefix("Bearer ")

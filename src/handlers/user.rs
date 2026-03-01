@@ -1,4 +1,4 @@
-use tracing::{info};
+use tracing::{info, debug};
 use axum::{
     extract::Extension,
     Json,
@@ -14,6 +14,9 @@ pub async fn create_new_user(
     Extension(pool): Extension<PgPool>,
     Json(payload): Json<NewUser>
 ) -> Result<Json<User>, AppError> {
+    info!("[POST /users] Received request to create new user");
+    debug!("Request payload - username: {}, email: {}", payload.username, payload.email);
+    
     let new_user = tokio::task::spawn_blocking(move || -> Result<_, AppError> {
         let mut conn = get_conn(&pool)?;
         use quoteyourlife_be::schema::users::dsl::*;
@@ -27,13 +30,17 @@ pub async fn create_new_user(
     .map_err(AppError::AsyncTaskError)?
     ?;
 
-    info!("Created new user: {:?}", new_user);
+    info!("[POST /users] Successfully created new user with ID: {}", new_user.id);
+    debug!("Created user: username={}", new_user.username);
     Ok(Json(new_user))
 }
 
 pub async fn get_all_users(
     Extension(pool): Extension<PgPool>,
 ) -> Result<Json<Vec<User>>, AppError> {
+    info!("[GET /users] Received request to fetch all users");
+    debug!("Starting database query for users");
+    
     let users = tokio::task::spawn_blocking(move || -> Result<_, AppError> {
         let mut conn = get_conn(&pool)?;
         use quoteyourlife_be::schema::users::dsl::*;
@@ -44,6 +51,7 @@ pub async fn get_all_users(
     .map_err(AppError::AsyncTaskError)?
     ?;
 
-    info!("Fetches {} users", users.len());
+    info!("[GET /users] Successfully fetched {} users", users.len());
+    debug!("Response payload size: {} items", users.len());
     Ok(Json(users))
 }
