@@ -1,9 +1,13 @@
 mod handlers;
 mod utils;
 mod middlewares;
+mod routes;
 
 use axum::{
-    Extension, Router, extract::DefaultBodyLimit, middleware::{self}, routing::{get, post}
+    Extension, 
+    Router, 
+    extract::DefaultBodyLimit, 
+    routing::get
 };
 
 use dotenv::dotenv;
@@ -40,17 +44,16 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async {"Hello, world!"}))
         .route("/health", get(|| async {"Health: Good"}))
-        .route("/quotes", get(handlers::quote::get_all_quotes).post(handlers::quote::create_new_quote))
-        .route("/gallery", get(handlers::nft::get_all_nft).post(handlers::nft::create_new_nft))
-        .route("/users", get(handlers::user::get_all_users).post(handlers::user::create_new_user).layer(middleware::from_fn(middlewares::jwt::jwt_validation)))
-        .route("/article", get(handlers::article::get_all_articles).post(handlers::article::create_new_article))
-        .route("/auth/login", post(handlers::auth::login))
-        .route("/auth/verify", post(handlers::auth::verify_jwt))
+        .nest("/quotes", routes::quote::router())
+        .nest("/gallery", routes::nft::router())
+        .nest("/users", routes::user::router())
+        .nest("/article", routes::article::router())
+        .nest("/auth", routes::auth::router())
         .fallback(handlers::handle_404)
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))
         .layer(cors) // Middleware CORS
-        .layer(Extension(pool)); // Tambahkan pool ke layer Axum agar bisa diakses handler
+        .layer(Extension(pool)); 
         
     // Definisikan alamat server
     let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
