@@ -60,7 +60,7 @@ pub async fn login(
     if verify(&password, &result[0].password_hash).expect("Gagal verifikasi") {
         info!("Login Berhasil");
 
-        let token = tokio::task::spawn_blocking(move || -> Result <String, jsonwebtoken::errors::Error>{
+        let token = tokio::task::spawn_blocking(move || -> Result <String, AppError>{
             create_jwt(&result[0].id.to_string())
         }).await
         .expect("Error pada saat tokenisasi");

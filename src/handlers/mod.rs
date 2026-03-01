@@ -22,6 +22,8 @@ pub enum AppError {
     DatabaseError(diesel::result::Error),
     PoolError(r2d2::Error),
     AsyncTaskError(tokio::task::JoinError),
+    JWTValidationError(jsonwebtoken::errors::Error),
+    GeneralError(String)
 }
 
 // 2. Implementasi IntoResponse
@@ -39,6 +41,14 @@ impl IntoResponse for AppError {
             AppError::AsyncTaskError(task_err) => {
                 error!("Async task error: {:?}", task_err);
                 (StatusCode::INTERNAL_SERVER_ERROR, "An internal server error occurred".to_string())
+            }
+            AppError::JWTValidationError(err) => {
+                error!("JWT Error: {:?}", err);
+                (StatusCode::UNAUTHORIZED, "JWT Validation Error: Unauthorized".to_string())
+            },
+            AppError::GeneralError(err) => {
+                error!("Error: {:?}", err);
+                (StatusCode::INTERNAL_SERVER_ERROR, err)
             }
         };
 

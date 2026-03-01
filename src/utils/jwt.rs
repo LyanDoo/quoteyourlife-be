@@ -16,6 +16,8 @@ use serde::{
     Serialize
 };
 
+use crate::handlers::AppError;
+
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Claims {
     pub sub: String,
@@ -23,7 +25,7 @@ pub struct Claims {
     pub iat: usize
 }
 
-pub fn create_jwt(user_id: &str) -> Result<String, jsonwebtoken::errors::Error>{
+pub fn create_jwt(user_id: &str) -> Result<String, AppError>{
     let secret_key = env::var("JWT_KEY").expect("Gagal membaca environment variable");
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() as usize;
     let claims = Claims {
@@ -35,7 +37,7 @@ pub fn create_jwt(user_id: &str) -> Result<String, jsonwebtoken::errors::Error>{
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(secret_key.as_ref())
-    )
+    ).map_err(|err| AppError::JWTValidationError(err))
 }
 
 pub fn verify_jwt(token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
