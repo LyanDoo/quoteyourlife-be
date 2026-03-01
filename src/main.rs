@@ -1,12 +1,9 @@
 mod handlers;
 mod utils;
+mod middlewares;
 
 use axum::{
-    routing::get,
-    routing::post,
-    Router,
-    Extension,
-    extract::DefaultBodyLimit
+    Extension, Router, extract::DefaultBodyLimit, middleware::{self}, routing::{get, post}
 };
 
 use dotenv::dotenv;
@@ -18,7 +15,6 @@ use tower_http::{
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use quoteyourlife_be::db;
-
 
 #[tokio::main]
 async fn main() {
@@ -46,7 +42,7 @@ async fn main() {
         .route("/health", get(|| async {"Health: Good"}))
         .route("/quotes", get(handlers::quote::get_all_quotes).post(handlers::quote::create_new_quote))
         .route("/gallery", get(handlers::nft::get_all_nft).post(handlers::nft::create_new_nft))
-        .route("/users", get(handlers::user::get_all_users).post(handlers::user::create_new_user))
+        .route("/users", get(handlers::user::get_all_users).post(handlers::user::create_new_user).layer(middleware::from_fn(middlewares::jwt::jwt_validation)))
         .route("/article", get(handlers::article::get_all_articles).post(handlers::article::create_new_article))
         .route("/auth/login", post(handlers::auth::login))
         .fallback(handlers::handle_404)
