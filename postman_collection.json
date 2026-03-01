@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "QuoteYourLife Backend API",
-    "description": "Collection of all endpoints for QuoteYourLife Backend API",
+    "description": "Collection of all endpoints for QuoteYourLife Backend API. All endpoints use {{base_url}} variable. Protected endpoints use {{token}} for authorization.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -14,12 +14,11 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/",
+              "raw": "{{base_url}}/",
               "protocol": "http",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 ""
               ]
@@ -34,12 +33,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/health",
-              "protocol": "http",
+              "raw": "{{base_url}}/health",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "health"
               ]
@@ -59,12 +58,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/quotes",
-              "protocol": "http",
+              "raw": "{{base_url}}/quotes",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "quotes"
               ]
@@ -88,12 +87,12 @@
               "raw": "{\n  \"text\": \"The only way to do great work is to love what you do.\",\n  \"author\": \"Steve Jobs\"\n}"
             },
             "url": {
-              "raw": "http://localhost:3000/quotes",
-              "protocol": "http",
+              "raw": "{{base_url}}/quotes",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "quotes"
               ]
@@ -113,12 +112,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/gallery",
-              "protocol": "http",
+              "raw": "{{base_url}}/gallery",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "gallery"
               ]
@@ -158,12 +157,12 @@
               ]
             },
             "url": {
-              "raw": "http://localhost:3000/gallery",
-              "protocol": "http",
+              "raw": "{{base_url}}/gallery",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "gallery"
               ]
@@ -181,19 +180,26 @@
           "name": "Get All Users",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "disabled": false,
+                "description": "JWT token for authorization"
+              }
+            ],
             "url": {
-              "raw": "http://localhost:3000/users",
-              "protocol": "http",
+              "raw": "{{base_url}}/users",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "users"
               ]
             },
-            "description": "Retrieve all users"
+            "description": "Retrieve all users - Requires authentication"
           },
           "response": []
         },
@@ -212,12 +218,12 @@
               "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"john@example.com\",\n  \"password_hash\": \"hashed_password_here\",\n  \"full_name\": \"John Doe\"\n}"
             },
             "url": {
-              "raw": "http://localhost:3000/users",
-              "protocol": "http",
+              "raw": "{{base_url}}/users",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "users"
               ]
@@ -237,12 +243,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/article",
-              "protocol": "http",
+              "raw": "{{base_url}}/article",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "article"
               ]
@@ -266,12 +272,12 @@
               "raw": "{\n  \"title\": \"Getting Started with Rust\",\n  \"slug\": \"getting-started-with-rust\",\n  \"excerpt\": \"A beginner's guide to Rust programming language\",\n  \"content\": {\"blocks\": [], \"version\": \"2.27.0\"},\n  \"status\": \"Published\",\n  \"author_id\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
             },
             "url": {
-              "raw": "http://localhost:3000/article",
-              "protocol": "http",
+              "raw": "{{base_url}}/article",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "article"
               ]
@@ -287,6 +293,25 @@
       "item": [
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 202) {",
+                  "  try {",
+                  "    let jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('✅ Token saved to collection variable');",
+                  "  } catch(e) {",
+                  "    console.log('❌ Could not parse response as JSON');",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -300,18 +325,18 @@
               "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"your_password_here\"\n}"
             },
             "url": {
-              "raw": "http://localhost:3000/auth/login",
-              "protocol": "http",
+              "raw": "{{base_url}}/auth/login",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "auth",
                 "login"
               ]
             },
-            "description": "User login endpoint. Returns JWT token on successful login"
+            "description": "User login endpoint. Returns JWT token on successful login. Token is automatically saved to {{token}} variable."
           },
           "response": []
         },
@@ -331,18 +356,18 @@
               "raw": ""
             },
             "url": {
-              "raw": "http://localhost:3000/auth/verify",
-              "protocol": "http",
+              "raw": "{{base_url}}/auth/verify",
+              "protocol": "{{protocol}}",
               "host": [
-                "localhost"
+                "{{hostname}}"
               ],
-              "port": "3000",
+              "port": "{{port}}",
               "path": [
                 "auth",
                 "verify"
               ]
             },
-            "description": "Verify JWT token validity. Pass token in Authorization header with Bearer prefix"
+            "description": "Verify JWT token validity. Uses token from {{token}} variable with Bearer prefix"
           },
           "response": []
         }
@@ -353,13 +378,32 @@
     {
       "key": "base_url",
       "value": "http://localhost:3000",
-      "type": "string"
+      "type": "string",
+      "description": "Full base URL (protocol://hostname:port)"
+    },
+    {
+      "key": "protocol",
+      "value": "http",
+      "type": "string",
+      "description": "Protocol (http or https)"
+    },
+    {
+      "key": "hostname",
+      "value": "localhost",
+      "type": "string",
+      "description": "Server hostname"
+    },
+    {
+      "key": "port",
+      "value": "3000",
+      "type": "string",
+      "description": "Server port"
     },
     {
       "key": "token",
       "value": "",
       "type": "string",
-      "description": "JWT token received from login endpoint"
+      "description": "JWT token received from login endpoint. Automatically set after successful login."
     }
   ]
 }
